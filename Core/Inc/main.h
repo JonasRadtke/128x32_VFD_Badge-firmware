@@ -85,8 +85,6 @@ void Error_Handler(void);
 #define DIS_GCP_GPIO_Port GPIOB
 #define DIS_V_ENABLE_Pin LL_GPIO_PIN_3
 #define DIS_V_ENABLE_GPIO_Port GPIOB
-#define CHARGER_QON_Pin LL_GPIO_PIN_4
-#define CHARGER_QON_GPIO_Port GPIOB
 #define CHARGER_CHARGE_EN_Pin LL_GPIO_PIN_5
 #define CHARGER_CHARGE_EN_GPIO_Port GPIOB
 #define I2C_SCL_Pin LL_GPIO_PIN_6

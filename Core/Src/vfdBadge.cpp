@@ -21,6 +21,7 @@ void vfdBadge::init(){
 		vRam.clearFrameBuffer(3);
 		display.init();
 
+		this->charger.activateBoostMode(true);
 		this->enableFilamentVoltage(true);
 		this->enableDisplayVoltage(true);
 		HAL_TIM_Base_Start_IT(&htim6);
@@ -28,13 +29,12 @@ void vfdBadge::init(){
 
 void vfdBadge::run(){
 
-
-
-
-
-	if(displayRefreshTask.task(HAL_GetTick(), 8)){
-//		display.fillGridBytes();
-//		display.newFrame();
+	if(displayRefreshTask.task(HAL_GetTick(), 1000)){
+		loadImage(&vRam, bmpI);
+		bmpI++;
+		if (bmpI > 440) {
+		bmpI = 1;
+		}
 	}
 
 	if(framebufferTask.task(HAL_GetTick(), 1000)){

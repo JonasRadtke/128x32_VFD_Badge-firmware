@@ -422,7 +422,7 @@ static void MX_GPIO_Init(void)
 
   /**/
   LL_GPIO_ResetOutputPin(GPIOB, DIS_BLK_Pin|DIS_LAT_Pin|DIS_GCP_Pin|DIS_V_ENABLE_Pin
-                          |CHARGER_QON_Pin|CHARGER_CHARGE_EN_Pin|CHARGER_POWER_SEL_Pin|DIS_FILAMENT_V_EN_Pin);
+                          |CHARGER_CHARGE_EN_Pin|CHARGER_POWER_SEL_Pin|DIS_FILAMENT_V_EN_Pin);
 
   /**/
   GPIO_InitStruct.Pin = SD_CS_Pin;
@@ -440,7 +440,7 @@ static void MX_GPIO_Init(void)
 
   /**/
   GPIO_InitStruct.Pin = DIS_BLK_Pin|DIS_LAT_Pin|DIS_GCP_Pin|DIS_V_ENABLE_Pin
-                          |CHARGER_QON_Pin|CHARGER_CHARGE_EN_Pin|CHARGER_POWER_SEL_Pin|DIS_FILAMENT_V_EN_Pin;
+                          |CHARGER_CHARGE_EN_Pin|CHARGER_POWER_SEL_Pin|DIS_FILAMENT_V_EN_Pin;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
