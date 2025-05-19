@@ -24,7 +24,7 @@ public:
 	void enableDisplay(bool on);
 
 	void newFrame();
-	void newSegment(uint8_t data[]);
+	void newSegment(uint8_t dataSin1[], uint8_t dataSin2[]);
 	void fillGridBytes();
 	void clearBuffer();
 
