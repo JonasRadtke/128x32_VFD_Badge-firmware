@@ -21,14 +21,14 @@ void MN12832L::init(){
 
 void MN12832L::newFrame(){
 		uint32_t datlen = 44;
-		HAL_SuspendTick();
+//		HAL_SuspendTick();
 
 		uint32_t i = 0;
 		while (datlen--) {
 			this->newSegment(this->outBuffer[i]);
 			i++;
 		}
-		HAL_ResumeTick();
+//		HAL_ResumeTick();
 }
 
 void MN12832L::newSegment(uint8_t data[]){

@@ -17,6 +17,7 @@ public:
 	void init();
 
 	uint8_t outBuffer[44][30];
+	uint8_t outBuffer2[44][30];
 
 	void enableDisplayVoltage(bool on);
 	void enableFilamentVoltage(bool on);

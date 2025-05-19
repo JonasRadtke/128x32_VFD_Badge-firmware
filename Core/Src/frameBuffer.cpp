@@ -9,21 +9,58 @@ uint8_t frameBuffer::getPixelFromVram(uint32_t x, uint32_t y) {
 	return this->buffer.at(x).at(y);
 }
 
-void frameBuffer::frameBufferToOutBuffer(uint8_t outPtr[][30]) {
+const uint32_t evenGridBits[12] = {0x800000, 0x200000, 0x80000, 0x20000, 0x8000, 0x2000, 0x800, 0x200, 0x80, 0x20, 0x8, 0x2};
+const uint32_t oddGridBits[12]  = {0x40000, 0x100000, 0x400000, 0x1000, 0x4000, 0x10000, 0x40, 0x100, 0x400, 0x1, 0x4, 0x10};
+
+void frameBuffer::frameBufferToOutBuffer(uint8_t outSin1Ptr[][30], uint8_t outSin2Ptr[][30]) {
+
+	// Es gibt 44 Grids, mit je 3 Pixel pro Reihe, insgesamt 32 Reihen
+
 	for (uint32_t grid = 0; grid < 43; grid++) {
 
-		uint32_t tempbyte[8] = { 0 };
+		uint32_t gridEven = grid % 2;
+		uint32_t gridX3	= grid * 3;
+
+		uint32_t tempbyteSin1[8] = { 0 };
+		uint32_t tempbyteSin2[8] = { 0 };
 
 		for (uint32_t y = 0; y < 32; y++) {
 			
+			uint32_t yMod4X3 = (y % 4) * 3;
+			uint32_t yDiv4 = y / 4;
+
 			for (uint32_t x = 0; x < 3; x++) {
 
-				uint32_t xx = (grid * 3) + x;
+				uint32_t xx = gridX3 + x;
+				uint32_t index = yMod4X3 + x;
+
+				// 100% S1 und S2, 66% S2, 33% S1, 0% none
+				if (!gridEven) {
+					switch (this->buffer[xx][y]){
+					case 0: tempbyteSin1[yDiv4] |= evenGridBits[index]; tempbyteSin2[yDiv4] |= evenGridBits[index]; break; // 100%
+					case 1: tempbyteSin2[yDiv4] |= evenGridBits[index]; break; // 66%
+					case 2: tempbyteSin1[yDiv4] |= evenGridBits[index]; break; // 33%
+					case 3:  break; // Off
+					default: ; break;
+					}
+				}
+				else{
+					switch (this->buffer[xx][y]){
+					case 0: tempbyteSin1[yDiv4] |= oddGridBits[index]; tempbyteSin2[yDiv4] |= oddGridBits[index];  break; // 100%
+					case 1: tempbyteSin2[yDiv4] |= oddGridBits[index]; break; // 66%
+					case 2: tempbyteSin1[yDiv4] |= oddGridBits[index]; break; // 33%
+					case 3:  break; // Off
+					default: ; break;
+					}
+				}
+
+	/*
 				if (!this->buffer[xx][y]) {
 
-
-					if (!(grid % 2)) {
-						switch ((((y%4)*3)) + x) {
+					uint32_t index = yMod4X3 + x;
+					if (!gridEven) {
+						tempbyteSin1[yDiv4] |= evenGridBits[index];
+					/*	switch ((((y%4)*3)) + x) {
 						case 0: tempbyte[y / 4] |= (1 << 23); break;
 						case 1: tempbyte[y / 4] |= (1 << 21); break;
 						case 2: tempbyte[y / 4] |= (1 << 19); break;
@@ -40,6 +77,8 @@ void frameBuffer::frameBufferToOutBuffer(uint8_t outPtr[][30]) {
 						}
 					}
 					else {
+						tempbyteSin1[yDiv4] |= oddGridBits[index];
+						/*
 						switch ((((y % 4) * 3)) + x) {
 						case 0: tempbyte[y / 4] |= (1 << 18); break;
 						case 1: tempbyte[y / 4] |= (1 << 20); break;
@@ -57,18 +96,23 @@ void frameBuffer::frameBufferToOutBuffer(uint8_t outPtr[][30]) {
 						}
 					}
 				}
-
+*/
 			}
 		
 		}
 
+
+		// Ziel ist outSin1Ptr
 		for (uint32_t bytes = 0; bytes < 24; bytes+=3) {
-		//	this->outBuffer[grid][bytes] = (tempbyte[bytes/3] >> 16) & 0xFF;
-		//	this->outBuffer[grid][bytes +1] = (tempbyte[bytes/3] >> 8) & 0xFF;
-		//	this->outBuffer[grid][bytes +2] = tempbyte[bytes/3] & 0xFF;
-			outPtr[grid][bytes] = (tempbyte[bytes/3] >> 16) & 0xFF;
-			outPtr[grid][bytes +1] = (tempbyte[bytes/3] >> 8) & 0xFF;
-			outPtr[grid][bytes +2] = tempbyte[bytes/3] & 0xFF;
+			uint32_t tempValSin1 = tempbyteSin1[bytes/3];
+			uint32_t tempValSin2 = tempbyteSin2[bytes/3];
+			outSin1Ptr[grid][bytes] = (tempValSin1 >> 16) & 0xFF;
+			outSin1Ptr[grid][bytes + 1] = (tempValSin1 >> 8) & 0xFF;
+			outSin1Ptr[grid][bytes + 2] = tempValSin1 & 0xFF;
+
+			outSin2Ptr[grid][bytes] = (tempValSin2 >> 16) & 0xFF;
+			outSin2Ptr[grid][bytes + 1] = (tempValSin2 >> 8) & 0xFF;
+			outSin2Ptr[grid][bytes + 2] = tempValSin2 & 0xFF;
 		}
 
 	}
@@ -80,6 +124,20 @@ void frameBuffer::frameBufferToOutBuffer(uint8_t outPtr[][30]) {
 }
 
 void frameBuffer::drawPixelinVram(uint32_t x, uint32_t y, uint8_t color) {
+	this->buffer[x][y] = color;
+}
+
+void frameBuffer::clearFrameBuffer(uint8_t color) {
+	for (uint32_t x = 0; x < 129; x++) {
+		for (uint32_t y = 0; y < 32; y++) {
+			this->buffer[x][y] = color;
+		}
+	}
+}
+
+
+/*
+void frameBuffer::drawPixelinVram(uint32_t x, uint32_t y, uint8_t color) {
 	this->buffer.at(x).at(y) = color;
 }
 
@@ -90,7 +148,7 @@ void frameBuffer::clearFrameBuffer(uint8_t color) {
 		}
 	}
 }
-
+*/
 uint32_t frameBuffer::draw_char(uint32_t x, uint32_t y, const uint8_t font[]) {
 	uint8_t width = font[0];  // Erstes Byte = Zeichenbreite
 	for (uint8_t row = 0; row < 6; row++) {

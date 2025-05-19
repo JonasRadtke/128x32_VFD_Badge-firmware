@@ -30,14 +30,24 @@ void vfdBadge::init(){
 
 void vfdBadge::run(){
 
+	uint32_t zeit1 = 0;
+	uint32_t zeit2 = 0;
+
 	if(displayRefreshTask.task(HAL_GetTick(), 100)){
+		zeit1 = HAL_GetTick();
 		loadImage(&this->vRam, bmpI);
 		bmpI++;
 		if (bmpI > 9) {
 		bmpI = 1;
 		}
-	    uint8_t (*ptr)[30] = display.outBuffer;  // ptr zeigt auf ein Array mit 32 int-Elementen
-	    vRam.frameBufferToOutBuffer(ptr);
+
+	    uint8_t (*ptr1)[30] = display.outBuffer;  // ptr zeigt auf ein Array mit 32 int-Elementen
+	    uint8_t (*ptr2)[30] = display.outBuffer2;  // ptr zeigt auf ein Array mit 32 int-Elementen
+
+	    vRam.frameBufferToOutBuffer(ptr1, ptr2);
+	    zeit2 = HAL_GetTick() - zeit1;
+	    zeit2 = zeit2+1;
+
 	}
 
 /*	if(framebufferTask.task(HAL_GetTick(), 1000)){

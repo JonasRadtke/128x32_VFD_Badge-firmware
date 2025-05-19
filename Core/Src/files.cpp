@@ -1,3 +1,4 @@
+#include "main.h"
 #include "files.h"
 #include <stdio.h>
 #include <string>
@@ -36,9 +37,13 @@ int loadImage(frameBuffer* vram, uint32_t bmpIndex){
 
 	path = "/0/" + std::to_string(bmpIndex) + ".bmp";
 
+
+
 	// Datei �ffnen
 	res = f_open(File, path.c_str(), FA_READ);
 	if (res != FR_OK) return res;
+
+
 
 	BITMAPFILEHEADER fileheader;				// Variable f�r FileHeader
 	BITMAPFILEHEADER* headptr = &fileheader;	// Pointer darauf
@@ -53,8 +58,8 @@ int loadImage(frameBuffer* vram, uint32_t bmpIndex){
 	f_read(File, headptr, sizeof(fileheader), &readBytes);		// Fileheader in Variable einlesen
 	if (headptr->bfType == 19778)								// Ist es eine BMP?
 	{
-		res = f_read(File, infoptr, sizeof(infoheader), &readBytes);	// Infoheader in Variable einlesen
-		res = f_read(File, colorPalettePtr, sizeof(colorPalette), &readBytes);	// Paletten Header
+//		res = f_read(File, infoptr, sizeof(infoheader), &readBytes);	// Infoheader in Variable einlesen
+	//	res = f_read(File, colorPalettePtr, sizeof(colorPalette), &readBytes);	// Paletten Header
 	}
 	else
 	{
@@ -83,8 +88,11 @@ int loadImage(frameBuffer* vram, uint32_t bmpIndex){
 	}
 	res = f_close( File );
 	if (res != FR_OK) return res;
-	return 1;
 
+
+
+
+	return 1;
 
 }
 
