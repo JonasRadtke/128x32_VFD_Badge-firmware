@@ -115,7 +115,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   HAL_TIM_Base_Stop_IT(&htim6);
-
+  LL_SPI_Enable(SPI1);
   vfdBadge app;
   app.init();
   while (1)
@@ -422,7 +422,10 @@ static void MX_GPIO_Init(void)
 
   /**/
   LL_GPIO_ResetOutputPin(GPIOB, DIS_BLK_Pin|DIS_LAT_Pin|DIS_GCP_Pin|DIS_V_ENABLE_Pin
-                          |CHARGER_QON_Pin|CHARGER_CHARGE_EN_Pin|CHARGER_POWER_SEL_Pin|DIS_FILAMENT_V_EN_Pin);
+                          |CHARGER_CHARGE_EN_Pin|CHARGER_POWER_SEL_Pin|DIS_FILAMENT_V_EN_Pin);
+
+  /**/
+  LL_GPIO_SetOutputPin(CHARGER_QON_GPIO_Port, CHARGER_QON_Pin);
 
   /**/
   GPIO_InitStruct.Pin = SD_CS_Pin;

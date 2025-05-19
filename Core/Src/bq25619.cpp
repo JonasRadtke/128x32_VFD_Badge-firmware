@@ -6,7 +6,6 @@
  */
 
 #include "main.h"
-#include "twi.h"
 #include <stdint.h>
 #include "bq25619.h"
 

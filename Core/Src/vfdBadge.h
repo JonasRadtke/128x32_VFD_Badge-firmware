@@ -13,6 +13,7 @@
 #include "crapScheduler.h"
 #include "MN12832L.h"
 #include "frameBuffer.h"
+#include "files.h"
 
 
 class vfdBadge {
@@ -26,6 +27,8 @@ private:
 	crapScheduler statusThread;
 	crapScheduler displayRefreshTask;
 	crapScheduler framebufferTask;
+
+	uint32_t bmpI = 1;
 public:
 	vfdBadge();
 	void init();
