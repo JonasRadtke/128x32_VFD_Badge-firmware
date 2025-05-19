@@ -16,6 +16,15 @@ DIR dir;					/* Directory object */
 FRESULT res;
 static FILINFO fno;
 
+void initSDCard(){
+	uint32_t i;
+	uint32_t j;
+	FRESULT res;
+	res = f_mount(&FatFs, "", 0);
+	if (res != FR_OK) return;
+}
+
+
 
 int loadImage(frameBuffer* vram, uint32_t bmpIndex){
 	std::string path;

@@ -20,6 +20,7 @@ void vfdBadge::init(){
 	this->charger.ResetWatchDog();
 		vRam.clearFrameBuffer(3);
 		display.init();
+		initSDCard();
 
 		this->charger.activateBoostMode(true);
 		this->enableFilamentVoltage(true);
@@ -29,15 +30,17 @@ void vfdBadge::init(){
 
 void vfdBadge::run(){
 
-	if(displayRefreshTask.task(HAL_GetTick(), 1000)){
-		loadImage(&vRam, bmpI);
+	if(displayRefreshTask.task(HAL_GetTick(), 100)){
+		loadImage(&this->vRam, bmpI);
 		bmpI++;
-		if (bmpI > 440) {
+		if (bmpI > 9) {
 		bmpI = 1;
 		}
+	    uint8_t (*ptr)[30] = display.outBuffer;  // ptr zeigt auf ein Array mit 32 int-Elementen
+	    vRam.frameBufferToOutBuffer(ptr);
 	}
 
-	if(framebufferTask.task(HAL_GetTick(), 1000)){
+/*	if(framebufferTask.task(HAL_GetTick(), 1000)){
 
 		vRam.drawString("Loading... Hello WORLD TEST 123!", 3, 3);
 		vRam.drawString("Loading... Hello WORLD TEST 123!", 3, 10);
@@ -47,7 +50,7 @@ void vfdBadge::run(){
 	    uint8_t (*ptr)[30] = display.outBuffer;  // ptr zeigt auf ein Array mit 32 int-Elementen
 	    vRam.frameBufferToOutBuffer(ptr);
 
-	}
+	}*/
 
 
 
@@ -56,7 +59,7 @@ void vfdBadge::run(){
 		this->getStatus();
 		this->charger.ResetWatchDog();
 		if(this->powerSupplyConnected){
-		//	this->charger.enableCharging();
+			this->charger.enableCharging();
 		}
 		else{
 			this->charger.disableCharging();
@@ -68,8 +71,8 @@ void vfdBadge::run(){
 
 void vfdBadge::setChargerConfig(){
 	this->charger.inputPowerSel2400();
-	this->charger.setInputCurrentLimit(1500);
-	this->charger.setChargeCurrentLimit(1000);
+	this->charger.setInputCurrentLimit(2000);
+	this->charger.setChargeCurrentLimit(1400);
 	this->charger.setPrechargeLimit(40);
 	this->charger.setTerminationLimit(60);
 	this->charger.chargeBitEnable(1);
