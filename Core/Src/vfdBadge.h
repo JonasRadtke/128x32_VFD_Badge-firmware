@@ -29,6 +29,9 @@ private:
 	crapScheduler framebufferTask;
 
 	uint32_t bmpI = 1;
+	uint32_t bmpI2 = 1;
+	uint32_t displayMode = 5;
+	uint32_t scroll = 0;
 public:
 	vfdBadge();
 	void init();

@@ -13,8 +13,16 @@ class crapScheduler {
 private:
 	uint32_t lastCall = 0;
 public:
-	crapScheduler();
-	uint32_t task(uint32_t time, uint32_t taskTime);
+	crapScheduler() {
+	}
+	uint32_t task(uint32_t actualTime, uint32_t taskIntervallMs){
+		if(this->lastCall + taskIntervallMs < actualTime){
+			this->lastCall = actualTime;
+			return 1;
+		}
+		return 0;
+	}
+
 };
 
 #endif /* SRC_CRAPSCHEDULER_H_ */

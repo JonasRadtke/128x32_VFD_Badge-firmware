@@ -6,7 +6,7 @@ frameBuffer::frameBuffer() {
 }
 
 uint8_t frameBuffer::getPixelFromVram(uint32_t x, uint32_t y) {
-	return this->buffer.at(x).at(y);
+	return this->buffer[x][y];
 }
 
 const uint32_t evenGridBits[12] = {0x800000, 0x200000, 0x80000, 0x20000, 0x8000, 0x2000, 0x800, 0x200, 0x80, 0x20, 0x8, 0x2};
@@ -54,49 +54,7 @@ void frameBuffer::frameBufferToOutBuffer(uint8_t outSin1Ptr[][30], uint8_t outSi
 					}
 				}
 
-	/*
-				if (!this->buffer[xx][y]) {
 
-					uint32_t index = yMod4X3 + x;
-					if (!gridEven) {
-						tempbyteSin1[yDiv4] |= evenGridBits[index];
-					/*	switch ((((y%4)*3)) + x) {
-						case 0: tempbyte[y / 4] |= (1 << 23); break;
-						case 1: tempbyte[y / 4] |= (1 << 21); break;
-						case 2: tempbyte[y / 4] |= (1 << 19); break;
-						case 3: tempbyte[y / 4] |= (1 << 17); break;
-						case 4: tempbyte[y / 4] |= (1 << 15); break;
-						case 5: tempbyte[y / 4] |= (1 << 13); break;
-						case 6: tempbyte[y / 4] |= (1 << 11); break;
-						case 7: tempbyte[y / 4] |= (1 << 9); break;
-						case 8: tempbyte[y / 4] |= (1 << 7); break;
-						case 9: tempbyte[y / 4] |= (1 << 5); break;
-						case 10: tempbyte[y / 4] |= (1 << 3); break;
-						case 11: tempbyte[y / 4] |= (1 << 1); break;
-						default: ; break;
-						}
-					}
-					else {
-						tempbyteSin1[yDiv4] |= oddGridBits[index];
-						/*
-						switch ((((y % 4) * 3)) + x) {
-						case 0: tempbyte[y / 4] |= (1 << 18); break;
-						case 1: tempbyte[y / 4] |= (1 << 20); break;
-						case 2: tempbyte[y / 4] |= (1 << 22); break;
-						case 3: tempbyte[y / 4] |= (1 << 12); break;
-						case 4: tempbyte[y / 4] |= (1 << 14); break;
-						case 5: tempbyte[y / 4] |= (1 << 16); break;
-						case 6: tempbyte[y / 4] |= (1 << 6); break;
-						case 7: tempbyte[y / 4] |= (1 << 8); break;
-						case 8: tempbyte[y / 4] |= (1 << 10); break;
-						case 9: tempbyte[y / 4] |= (1 << 0); break;
-						case 10: tempbyte[y / 4] |= (1 << 2); break;
-						case 11: tempbyte[y / 4] |= (1 << 4); break;
-						default:; break;
-						}
-					}
-				}
-*/
 			}
 		
 		}
@@ -117,10 +75,6 @@ void frameBuffer::frameBufferToOutBuffer(uint8_t outSin1Ptr[][30], uint8_t outSi
 
 	}
 
-
-
-
-
 }
 
 void frameBuffer::drawPixelinVram(uint32_t x, uint32_t y, uint8_t color) {
@@ -135,20 +89,6 @@ void frameBuffer::clearFrameBuffer(uint8_t color) {
 	}
 }
 
-
-/*
-void frameBuffer::drawPixelinVram(uint32_t x, uint32_t y, uint8_t color) {
-	this->buffer.at(x).at(y) = color;
-}
-
-void frameBuffer::clearFrameBuffer(uint8_t color) {
-	for (uint32_t x = 0; x < this->buffer.size(); x++) {
-		for (uint32_t y = 0; y < this->buffer.at(x).size(); y++) {
-			this->buffer.at(x).at(y) = color;
-		}
-	}
-}
-*/
 uint32_t frameBuffer::draw_char(uint32_t x, uint32_t y, const uint8_t font[]) {
 	uint8_t width = font[0];  // Erstes Byte = Zeichenbreite
 	for (uint8_t row = 0; row < 6; row++) {
@@ -156,8 +96,7 @@ uint32_t frameBuffer::draw_char(uint32_t x, uint32_t y, const uint8_t font[]) {
 		for (uint8_t col = 0; col < width; col++) {
 			if (line & (1 << (width - 1 - col))) {  // Bit pr�fen
 				if ((x + col) < 128 && (y + row) < 32) {
-				//	vram[x + col][y + row] = 0;
-					this->buffer.at(x + col).at(y + row) = 0;
+					this->buffer[x + col][y + row] = 0;
 				}
 			}
 		}
@@ -167,9 +106,77 @@ uint32_t frameBuffer::draw_char(uint32_t x, uint32_t y, const uint8_t font[]) {
 
 void frameBuffer::drawString(std::string text, uint32_t x, uint32_t y) {
 	for (char c : text) {
-		if (x > this->buffer.size() - 3) break;
-		if (y > this->buffer.at(x).size() - 6) break;
+		if (x > 129 - 3) break;
+		if (y > 32 - 6) break;
 		int ascii = static_cast<unsigned char>(c);
 		x = x + 1 + draw_char(x, y, font3x5[ascii - 32]);
 	}
 }
+
+void frameBuffer::draw_rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint8_t color) {
+	for (uint32_t i = 0; i < width; i++) {
+		if (x + i < 128 && y < 32) this->buffer[x + i][y] = color;                 // obere Kante
+		if (x + i < 128 && y + height - 1 < 32) this->buffer[x + i][y + height - 1] = color; // untere Kante
+	}
+	for (uint32_t j = 0; j < height; j++) {
+		if (x < 128 && y + j < 32) this->buffer[x][y + j] = color;                 // linke Kante
+		if (x + width - 1 < 128 && y + j < 32) this->buffer[x + width - 1][y + j] = color;   // rechte Kante
+	}
+}
+
+void frameBuffer::fill_rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint8_t color) {
+	for (uint32_t j = 0; j < height; j++) {
+		for (uint32_t i = 0; i < width; i++) {
+			if ((x + i) < 128 && (y + j) < 32) {
+				this->buffer[x + i][y + j] = color;
+			}
+		}
+	}
+}
+
+
+/*
+			if (!this->buffer[xx][y]) {
+
+				uint32_t index = yMod4X3 + x;
+				if (!gridEven) {
+					tempbyteSin1[yDiv4] |= evenGridBits[index];
+					switch ((((y%4)*3)) + x) {
+					case 0: tempbyte[y / 4] |= (1 << 23); break;
+					case 1: tempbyte[y / 4] |= (1 << 21); break;
+					case 2: tempbyte[y / 4] |= (1 << 19); break;
+					case 3: tempbyte[y / 4] |= (1 << 17); break;
+					case 4: tempbyte[y / 4] |= (1 << 15); break;
+					case 5: tempbyte[y / 4] |= (1 << 13); break;
+					case 6: tempbyte[y / 4] |= (1 << 11); break;
+					case 7: tempbyte[y / 4] |= (1 << 9); break;
+					case 8: tempbyte[y / 4] |= (1 << 7); break;
+					case 9: tempbyte[y / 4] |= (1 << 5); break;
+					case 10: tempbyte[y / 4] |= (1 << 3); break;
+					case 11: tempbyte[y / 4] |= (1 << 1); break;
+					default: ; break;
+					}
+				}
+				else {
+					tempbyteSin1[yDiv4] |= oddGridBits[index];
+
+					switch ((((y % 4) * 3)) + x) {
+					case 0: tempbyte[y / 4] |= (1 << 18); break;
+					case 1: tempbyte[y / 4] |= (1 << 20); break;
+					case 2: tempbyte[y / 4] |= (1 << 22); break;
+					case 3: tempbyte[y / 4] |= (1 << 12); break;
+					case 4: tempbyte[y / 4] |= (1 << 14); break;
+					case 5: tempbyte[y / 4] |= (1 << 16); break;
+					case 6: tempbyte[y / 4] |= (1 << 6); break;
+					case 7: tempbyte[y / 4] |= (1 << 8); break;
+					case 8: tempbyte[y / 4] |= (1 << 10); break;
+					case 9: tempbyte[y / 4] |= (1 << 0); break;
+					case 10: tempbyte[y / 4] |= (1 << 2); break;
+					case 11: tempbyte[y / 4] |= (1 << 4); break;
+					default:; break;
+					}
+				}
+			}
+*/
+
+
