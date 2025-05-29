@@ -12,7 +12,7 @@
 
 extern MN12832L display;
 
-void drawImageFromSd(frameBuffer *v,uint32_t folderNumber, uint32_t frameNumber){
+uint32_t drawImageFromSd(frameBuffer *v,uint32_t folderNumber, uint32_t frameNumber){
 	static uint32_t pictureIndex = 0;
 	loadImage(v, folderNumber, pictureIndex);
 	pictureIndex++;
@@ -20,11 +20,16 @@ void drawImageFromSd(frameBuffer *v,uint32_t folderNumber, uint32_t frameNumber)
 		pictureIndex = 0;
 	}
     v->frameBufferToOutBuffer(display.outBuffer, display.outBuffer2);
+
+    if(pictureIndex == 0){
+    	return 1;
+    }
+    return 0;
 }
 
 
 
-void drawJurassic(frameBuffer *v){
+uint32_t drawJurassic(frameBuffer *v){
 	static uint32_t vis = 0;
 	v->clearFrameBuffer();
 	if(vis){
@@ -36,6 +41,10 @@ void drawJurassic(frameBuffer *v){
 		vis = 1;
 	}
 	v->frameBufferToOutBuffer(display.outBuffer, display.outBuffer2);
+    if(vis == 0){
+    	return 1;
+    }
+    return 0;
 }
 
 constexpr int IMAGE_WIDTH = 568;
@@ -43,7 +52,7 @@ constexpr int IMAGE_HEIGHT = 32;
 constexpr int SCREEN_WIDTH = 128;
 constexpr int SCREEN_HEIGHT = 32;
 
-void drawAfd(frameBuffer *v){
+uint32_t drawAfd(frameBuffer *v){
 	static uint32_t scroll = 0;
 	for (int y = 0; y < SCREEN_HEIGHT; ++y) {
 		uint32_t y128 = y*128;
@@ -73,6 +82,12 @@ void drawAfd(frameBuffer *v){
 	if (scroll > 439) {
 		scroll = 0;
 	}
+    if(scroll == 0){
+    	return 1;
+    }
+    return 0;
+
+
 }
 
 

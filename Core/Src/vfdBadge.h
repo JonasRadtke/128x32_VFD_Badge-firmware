@@ -57,7 +57,7 @@ public:
 	void goingToSleep();
 	void wakeUp();
 
-	void loadNextFolder();
+	uint32_t loadNextFolder();
 };
 
 #endif /* SRC_VFDBADGE_H_ */

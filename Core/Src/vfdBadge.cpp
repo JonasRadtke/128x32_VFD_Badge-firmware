@@ -50,6 +50,8 @@ volatile uint32_t zeit4;
 
 void vfdBadge::run(){
 
+	uint32_t lastFrame = 0;
+
 	userbutton.debounce();
 
 	if(userbutton.isLongOneCycle() && this->running && !this->charging){
@@ -65,7 +67,7 @@ void vfdBadge::run(){
 			case 1:
 				if(framebufferTask.task(HAL_GetTick(), this->frameTime)){
 					zeit1 = HAL_GetTick();
-					drawImageFromSd(&vRam, this->actualBMPFolder, this->frameNumber);
+					lastFrame = drawImageFromSd(&vRam, this->actualBMPFolder, this->frameNumber);
 					zeit4 = HAL_GetTick() - zeit1;
 					zeit4 = zeit4++;
 				}
@@ -85,10 +87,14 @@ void vfdBadge::run(){
 		}
 
 
-
-		if(this->playTime.task(HAL_GetTick(), this->animationTimeMS) || userbutton.isShort()){
-			this->loadNextFolder();
+		if(lastFrame || userbutton.isShort()){
+			if(this->playTime.task(HAL_GetTick(), this->animationTimeMS) || userbutton.isShort()){
+				this->loadNextFolder();
+			}
 		}
+
+
+
 
 	}
 
@@ -195,7 +201,7 @@ void vfdBadge::wakeUp() {
 	this->wakeUpButton = 1;
 }
 
-void vfdBadge::loadNextFolder(){
+uint32_t vfdBadge::loadNextFolder(){
 	this->actualBMPFolder++;
 	if(this->actualBMPFolder > this->numberOfBMPFolders - 1){
 		this->actualBMPFolder = 0;
@@ -208,5 +214,10 @@ void vfdBadge::loadNextFolder(){
     this->frameNumber = std::stoul(strValue);
     strValue = iniData.iniData["config"]["animationTimeMS"];
     this->animationTimeMS = std::stoul(strValue);
+
+    if(this->actualBMPFolder == 0){
+    	return 1;
+    }
+    return 0;
 }
 

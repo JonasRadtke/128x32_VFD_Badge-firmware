@@ -8,7 +8,8 @@
 #ifndef SRC_PICTUREMODES_H_
 #define SRC_PICTUREMODES_H_
 
-void drawImageFromSd(frameBuffer *v,uint32_t folderNumber, uint32_t frameNumber);
-void drawJurassic(frameBuffer *v);
-void drawAfd(frameBuffer *v);
+uint32_t drawImageFromSd(frameBuffer *v,uint32_t folderNumber, uint32_t frameNumber);
+uint32_t drawJurassic(frameBuffer *v);
+uint32_t drawAfd(frameBuffer *v);
+
 #endif /* SRC_PICTUREMODES_H_ */
