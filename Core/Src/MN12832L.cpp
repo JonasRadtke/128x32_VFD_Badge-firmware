@@ -20,35 +20,29 @@ void MN12832L::init(){
 
 
 void MN12832L::newFrame(){
-		uint32_t datlen = 44;
-//		HAL_SuspendTick();
-
-		uint32_t i = 0;
-		while (datlen--) {
-			this->newSegment(this->outBuffer[i], this->outBuffer2[i]);
-			i++;
-		}
-//		HAL_ResumeTick();
+this->newSegment();
 }
 
-void MN12832L::newSegment(uint8_t dataSin1[], uint8_t dataSin2[]){
+void MN12832L::newSegment(){
+	uint32_t gridLen = 44;
+	uint32_t grid = 0;
+	while(gridLen--){
 		uint32_t datlen = 30;
-
 		GPIOB->BRR = DIS_BLK_Pin;
-		uint32_t i = 0;
+		uint32_t i = grid*30;
 		while (datlen--) {
 			while(!LL_SPI_IsActiveFlag_TXE(SPI2));
-			LL_SPI_TransmitData8(SPI2, dataSin2[i++] );
+			LL_SPI_TransmitData8(SPI2, this->outBuffer2[i++] );
 			if(datlen == 1){
 				GPIOB->BSRR = DIS_GCP_Pin;
 				GPIOB->BRR = DIS_GCP_Pin;
 			}
 		}
 		datlen = 30;
-		i=0;
+		i = grid*30;
 		while (datlen--) {
 			while(!LL_SPI_IsActiveFlag_TXE(SPI2));
-			LL_SPI_TransmitData8(SPI2, dataSin1[i++] );
+			LL_SPI_TransmitData8(SPI2, this->outBuffer[i++] );
 			if(datlen == 5){
 				GPIOB->BSRR = DIS_GCP_Pin;
 				GPIOB->BRR = DIS_GCP_Pin;
@@ -60,23 +54,30 @@ void MN12832L::newSegment(uint8_t dataSin1[], uint8_t dataSin2[]){
 		GPIOB->BSRR = DIS_LAT_Pin;
 		GPIOB->BRR = DIS_LAT_Pin;
 
+		grid++;
+	}
+
+
+
+
+
+
+
 }
 
 void MN12832L::fillGridBytes(){
 	for(uint32_t grid = 0; grid < 44; grid++){
-		this->outBuffer[grid][24 + grid/8] |= (1 << (7-grid%8));
-		this->outBuffer[grid][24 + (grid+1)/8] |= (1 << (7-((grid+1)%8)));
-		this->outBuffer2[grid][24 + grid/8] |= (1 << (7-grid%8));
-		this->outBuffer2[grid][24 + (grid+1)/8] |= (1 << (7-((grid+1)%8)));
+		this->outBuffer[grid*30+(24 + grid/8)] |= (1 << (7-grid%8));
+		this->outBuffer[grid*30+(24 + (grid+1)/8)] |= (1 << (7-((grid+1)%8)));
+		this->outBuffer2[grid*30+(24 + grid/8)] |= (1 << (7-grid%8));
+		this->outBuffer2[grid*30+(24 + (grid+1)/8)] |= (1 << (7-((grid+1)%8)));
 	}
 }
 
 void MN12832L::clearBuffer(){
-	for(uint32_t i = 0; i<44; i++){
-		for(uint32_t k = 0; k<30; k++){
-			this->outBuffer[i][k] = 0;
-			this->outBuffer2[i][k] = 0;
-		}
+	for(uint32_t i = 0; i<1320; i++){
+			this->outBuffer[i] = 0;
+			this->outBuffer2[i] = 0;
 	}
 	this->fillGridBytes();
 }

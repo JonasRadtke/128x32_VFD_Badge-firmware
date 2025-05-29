@@ -8,14 +8,17 @@
 
 class frameBuffer {
 private:
-	uint8_t buffer[129][32] = {};
+
 public:
+	uint8_t buffer[4096] = {};
 	frameBuffer();
-	void clearFrameBuffer(uint8_t color);
-	void frameBufferToOutBuffer(uint8_t outSin1Ptr[][30], uint8_t outSin2Ptr[][30]);
+	void clearFrameBuffer(void);
+	void fillBufferWithColor(uint8_t color);
+	void frameBufferToOutBuffer(uint8_t outSin1Ptr[], uint8_t outSin2Ptr[]);
 	uint8_t getPixelFromVram(uint32_t x, uint32_t y);
 
 	void drawPixelinVram(uint32_t x, uint32_t y, uint8_t color);
+	void drawPixelinVramArray(uint32_t x, uint8_t color);
 	void draw_rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint8_t color);
 	void fill_rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint8_t color);
 

@@ -16,15 +16,15 @@ public:
 	MN12832L();
 	void init();
 
-	uint8_t outBuffer[44][30];
-	uint8_t outBuffer2[44][30];
+	uint8_t outBuffer[1320];
+	uint8_t outBuffer2[1320];
 
 	void enableDisplayVoltage(bool on);
 	void enableFilamentVoltage(bool on);
 	void enableDisplay(bool on);
 
 	void newFrame();
-	void newSegment(uint8_t dataSin1[], uint8_t dataSin2[]);
+	void newSegment();
 	void fillGridBytes();
 	void clearBuffer();
 

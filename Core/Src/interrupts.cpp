@@ -10,11 +10,11 @@
 
 
 extern MN12832L display;
+extern volatile uint32_t wakeUpRequest;
+extern volatile uint32_t sleeping;
 
 extern TIM_HandleTypeDef htim6;
-
-uint32_t zeit1 = 0;
-uint32_t zeit2 = 0;
+extern TIM_HandleTypeDef htim7;
 
 void TIM6_DAC_LPTIM1_IRQHandler(void)
 {
@@ -22,3 +22,9 @@ void TIM6_DAC_LPTIM1_IRQHandler(void)
   display.newFrame();
 }
 
+
+
+void TIM7_LPTIM2_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&htim7);
+}

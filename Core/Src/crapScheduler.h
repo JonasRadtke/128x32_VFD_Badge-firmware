@@ -8,6 +8,7 @@
 #ifndef SRC_CRAPSCHEDULER_H_
 #define SRC_CRAPSCHEDULER_H_
 #include <stdint.h>
+#include "main.h"
 
 class crapScheduler {
 private:
@@ -24,5 +25,6 @@ public:
 	}
 
 };
+
 
 #endif /* SRC_CRAPSCHEDULER_H_ */
