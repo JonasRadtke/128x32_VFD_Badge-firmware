@@ -14,6 +14,7 @@
 #include "MN12832L.h"
 #include "frameBuffer.h"
 #include "files.h"
+#include "buttonDebounce.h"
 
 
 class vfdBadge {
@@ -24,11 +25,26 @@ private:
 	uint32_t stateOfCharge = 0;
 	uint32_t powerSupplyConnected = 0;
 
-	crapScheduler statusThread;
-	crapScheduler displayRefreshTask;
+	crapScheduler batteryStatusTask;
 	crapScheduler framebufferTask;
+	crapScheduler playTime;
 
-	uint32_t bmpI = 1;
+
+	uint32_t displayMode = 1;
+	uint32_t scroll = 0;
+
+	uint32_t running = 1;
+	uint32_t sleepingDelay = 0;
+	uint32_t wakeUpButton = 0;
+
+	buttonDebounce userbutton = buttonDebounce(USER_BT_GPIO_Port, USER_BT_Pin);
+
+	uint32_t numberOfBMPFolders = 0;
+	uint32_t frameTime = 100;
+	uint32_t animationTimeMS = 100;
+	uint32_t frameNumber = 1;
+	uint32_t actualBMPFolder = 0;
+
 public:
 	vfdBadge();
 	void init();
@@ -37,6 +53,11 @@ public:
 	void getStatus();
 	void enableDisplayVoltage(bool on);
 	void enableFilamentVoltage(bool on);
+
+	void goingToSleep();
+	void wakeUp();
+
+	void loadNextFolder();
 };
 
 #endif /* SRC_VFDBADGE_H_ */

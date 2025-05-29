@@ -4,4 +4,5 @@
 #include "frameBuffer.h"
 
 void initSDCard();
-int loadImage(frameBuffer* vram, uint32_t bmpIndex);
+void closeSDCard();
+int loadImage(frameBuffer* vram, uint32_t dir, uint32_t bmpIndex);

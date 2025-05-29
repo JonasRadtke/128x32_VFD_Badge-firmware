@@ -42,6 +42,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 void TIM6_DAC_LPTIM1_IRQHandler(void);
+void TIM7_LPTIM2_IRQHandler(void);
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
