@@ -5,6 +5,7 @@
  *      Author: Sentry
  */
 
+#include "vfdBadge.h"
 #include "frameBuffer.h"
 #include "crapScheduler.h"
 #include "MN12832L.h"
@@ -89,5 +90,18 @@ uint32_t drawAfd(frameBuffer *v){
 
 
 }
+
+uint32_t drawVersionInfo(frameBuffer *v){
+	v->clearFrameBuffer();
+	v->drawString("128x32 VFD Badge", 3, 3);
+	v->drawString(std::string("Version: ") + std::string(VersionNumberVFD), 3, 10);
+	v->drawString("J.Radtke - radtke.dk", 3, 24);
+	v->frameBufferToOutBuffer(display.outBuffer, display.outBuffer2);
+    return 0;
+}
+
+
+
+
 
 

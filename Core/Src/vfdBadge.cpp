@@ -29,6 +29,8 @@ vfdBadge::vfdBadge() {
     std::string strValue = iniData.iniData["bmpconfig"]["folders"];
     this->numberOfBMPFolders = std::stoul(strValue); // Umwandlung in uint32_t
 
+    loadBmpConfig(this->actualBMPFolder);
+
 }
 
 void vfdBadge::init(){
@@ -43,6 +45,8 @@ void vfdBadge::init(){
 		this->enableDisplayVoltage(true);
 		HAL_Delay(500);
 		HAL_TIM_Base_Start_IT(&htim6);
+		drawVersionInfo(&vRam);
+		HAL_Delay(2000);
 }
 
 volatile uint32_t zeit1;
@@ -50,12 +54,20 @@ volatile uint32_t zeit4;
 
 void vfdBadge::run(){
 
-	uint32_t lastFrame = 0;
-
 	userbutton.debounce();
 
-	if(userbutton.isLongOneCycle() && this->running && !this->charging){
+
+	if(!sleeping && !running && userbutton.isLongOneCycle()){
+		this->running = 1;
+		this->enableFilamentVoltage(true);
+		this->enableDisplayVoltage(true);
+		HAL_TIM_Base_Start_IT(&htim6);
+	}
+	else if(userbutton.isLongOneCycle() && this->running){
 		this->running = 0;
+		HAL_TIM_Base_Stop_IT(&htim6);
+		this->enableFilamentVoltage(false);
+		this->enableDisplayVoltage(false);
 	}
 	if(sleeping && userbutton.directState()){
 		wakeUpRequest = 1;
@@ -65,21 +77,24 @@ void vfdBadge::run(){
 	if(this->running){
 		switch(this->displayMode){
 			case 1:
-				if(framebufferTask.task(HAL_GetTick(), this->frameTime)){
+				if(framebufferTask.task(HAL_GetTick(), this->bmpFrameTime)){
+					this->animationTimeMS = this->bmpAnimationTimeMS;
 					zeit1 = HAL_GetTick();
-					lastFrame = drawImageFromSd(&vRam, this->actualBMPFolder, this->frameNumber);
+					this->lastFrame = drawImageFromSd(&vRam, this->actualBMPFolder, this->bmpFrameNumber);
 					zeit4 = HAL_GetTick() - zeit1;
 					zeit4 = zeit4++;
 				}
 				break;
 			case 2:
 				if(framebufferTask.task(HAL_GetTick(), 20)){
-					drawAfd(&vRam);
+					this->animationTimeMS = 10000;
+					this->lastFrame = drawAfd(&vRam);
 				}
 				break;
 			case 3:
 				if(framebufferTask.task(HAL_GetTick(), 300)){
-					drawJurassic(&vRam);
+					this->animationTimeMS = 10000;
+					this->lastFrame = drawJurassic(&vRam);
 				}
 				break;
 			default: this->displayMode = 1;
@@ -89,31 +104,23 @@ void vfdBadge::run(){
 
 		if(lastFrame || userbutton.isShort()){
 			if(this->playTime.task(HAL_GetTick(), this->animationTimeMS) || userbutton.isShort()){
-				this->loadNextFolder();
-			}
-		}
 
-
-
-
-	}
-
-/*
-		if (this->playTime.task(HAL_GetTick(), 30000) || userbutton.isShort()) {
-			displayMode++;
-			iniParser iniData;
-			test = iniData.parseINI("/0/");
-	        std::string strValue = iniData.iniData["config"]["frameTimeMs"];
-	        this->frameTime = std::stoul(strValue); // Umwandlung in uint32_t
-	        strValue = iniData.iniData["config"]["numberOfFrames"];
-	        this->frameNumber = std::stoul(strValue);
-
-			if(displayMode > 4){
-				displayMode = 1;
+				if(this->displayMode == 1){
+					if(this->loadNextBmpFolder()){
+						this->displayMode++;
+					}
+				}
+				else{
+					this->displayMode++;
+					if (this->displayMode > 3) {
+						this->displayMode = 1;
+					}
+				}
 			}
 		}
 	}
-*/
+
+
 
 
 
@@ -201,23 +208,28 @@ void vfdBadge::wakeUp() {
 	this->wakeUpButton = 1;
 }
 
-uint32_t vfdBadge::loadNextFolder(){
+uint32_t vfdBadge::loadNextBmpFolder(){
 	this->actualBMPFolder++;
 	if(this->actualBMPFolder > this->numberOfBMPFolders - 1){
 		this->actualBMPFolder = 0;
 	}
-	iniParser iniData;
-	iniData.parseINI("/" + std::to_string(this->actualBMPFolder) + "/");
-    std::string strValue = iniData.iniData["config"]["frameTimeMs"];
-    this->frameTime = std::stoul(strValue);
-    strValue = iniData.iniData["config"]["numberOfFrames"];
-    this->frameNumber = std::stoul(strValue);
-    strValue = iniData.iniData["config"]["animationTimeMS"];
-    this->animationTimeMS = std::stoul(strValue);
+
+	loadBmpConfig(this->actualBMPFolder);
 
     if(this->actualBMPFolder == 0){
     	return 1;
     }
     return 0;
+}
+
+void vfdBadge::loadBmpConfig(uint32_t folderNumber){
+	iniParser iniData;
+	iniData.parseINI("/" + std::to_string(folderNumber) + "/");
+    std::string strValue = iniData.iniData["config"]["frameTimeMs"];
+    this->bmpFrameTime = std::stoul(strValue);
+    strValue = iniData.iniData["config"]["numberOfFrames"];
+    this->bmpFrameNumber = std::stoul(strValue);
+    strValue = iniData.iniData["config"]["animationTimeMS"];
+    this->bmpAnimationTimeMS = std::stoul(strValue);
 }
 

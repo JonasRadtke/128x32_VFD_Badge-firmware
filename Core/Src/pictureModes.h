@@ -11,5 +11,6 @@
 uint32_t drawImageFromSd(frameBuffer *v,uint32_t folderNumber, uint32_t frameNumber);
 uint32_t drawJurassic(frameBuffer *v);
 uint32_t drawAfd(frameBuffer *v);
+uint32_t drawVersionInfo(frameBuffer *v);
 
 #endif /* SRC_PICTUREMODES_H_ */

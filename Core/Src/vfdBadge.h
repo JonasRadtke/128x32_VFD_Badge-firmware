@@ -16,6 +16,7 @@
 #include "files.h"
 #include "buttonDebounce.h"
 
+#define VersionNumberVFD ("0.0.3")
 
 class vfdBadge {
 private:
@@ -40,10 +41,16 @@ private:
 	buttonDebounce userbutton = buttonDebounce(USER_BT_GPIO_Port, USER_BT_Pin);
 
 	uint32_t numberOfBMPFolders = 0;
-	uint32_t frameTime = 100;
-	uint32_t animationTimeMS = 100;
-	uint32_t frameNumber = 1;
+
 	uint32_t actualBMPFolder = 0;
+	uint32_t bmpFrameTime = 100;
+	uint32_t bmpAnimationTimeMS = 100;
+	uint32_t bmpFrameNumber = 1;
+
+	uint32_t animationTimeMS = 100;
+
+	uint32_t lastFrame = 0;
+	uint32_t lastMode = 0;
 
 public:
 	vfdBadge();
@@ -57,7 +64,8 @@ public:
 	void goingToSleep();
 	void wakeUp();
 
-	uint32_t loadNextFolder();
+	uint32_t loadNextBmpFolder();
+	void loadBmpConfig(uint32_t folderNumber);
 };
 
 #endif /* SRC_VFDBADGE_H_ */
