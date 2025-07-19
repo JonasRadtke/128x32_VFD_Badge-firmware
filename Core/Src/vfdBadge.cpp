@@ -74,6 +74,7 @@ void vfdBadge::run(){
 	}
 
 
+	displayMode = 2;
 	if(this->running){
 		switch(this->displayMode){
 			case 1:
