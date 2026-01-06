@@ -16,7 +16,7 @@
 #include "files.h"
 #include "buttonDebounce.h"
 
-#define VersionNumberVFD ("0.0.3")
+#define VersionNumberVFD ("0.4")
 
 class vfdBadge {
 private:

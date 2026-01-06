@@ -112,6 +112,8 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
+	LL_GPIO_ResetOutputPin(EN_3_3V_GPIO_Port, EN_3_3V_Pin);
+	LL_GPIO_ResetOutputPin(EN_5V_GPIO_Port, EN_5V_Pin);
 
   /* USER CODE END 2 */
 
@@ -126,6 +128,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+//		LL_GPIO_SetOutputPin(EN_5V_GPIO_Port, EN_5V_Pin);
 	  app.run();
   }
   /* USER CODE END 3 */
@@ -469,6 +473,9 @@ static void MX_GPIO_Init(void)
                           |CHARGER_CHARGE_EN_Pin|CHARGER_POWER_SEL_Pin|DIS_FILAMENT_V_EN_Pin);
 
   /**/
+  LL_GPIO_SetOutputPin(GPIOA, EN_5V_Pin|EN_3_3V_Pin);
+
+  /**/
   LL_GPIO_SetOutputPin(CHARGER_QON_GPIO_Port, CHARGER_QON_Pin);
 
   /**/
@@ -493,6 +500,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = EN_5V_Pin|EN_3_3V_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
