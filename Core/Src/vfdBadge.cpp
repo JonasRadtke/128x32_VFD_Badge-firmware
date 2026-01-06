@@ -74,7 +74,7 @@ void vfdBadge::run(){
 	}
 
 
-	displayMode = 2;
+//	displayMode = 2;
 	if(this->running){
 		switch(this->displayMode){
 			case 1:
@@ -87,15 +87,15 @@ void vfdBadge::run(){
 				}
 				break;
 			case 2:
-				if(framebufferTask.task(HAL_GetTick(), 20)){
-					this->animationTimeMS = 10000;
-					this->lastFrame = drawAfd(&vRam);
-				}
-				break;
-			case 3:
 				if(framebufferTask.task(HAL_GetTick(), 300)){
 					this->animationTimeMS = 10000;
 					this->lastFrame = drawJurassic(&vRam);
+				}
+				break;
+			case 3:
+				if(framebufferTask.task(HAL_GetTick(), 20)){
+					this->animationTimeMS = 10000;
+					this->lastFrame = drawAfd(&vRam);
 				}
 				break;
 			default: this->displayMode = 1;
@@ -113,7 +113,7 @@ void vfdBadge::run(){
 				}
 				else{
 					this->displayMode++;
-					if (this->displayMode > 3) {
+					if (this->displayMode > 2) {
 						this->displayMode = 1;
 					}
 				}
